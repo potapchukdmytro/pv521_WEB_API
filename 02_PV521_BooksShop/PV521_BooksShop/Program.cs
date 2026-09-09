@@ -21,6 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Repositories
 builder.Services.AddScoped<BookRepostiory>();
+builder.Services.AddScoped<AuthorRepository>();
 
 var app = builder.Build();
 

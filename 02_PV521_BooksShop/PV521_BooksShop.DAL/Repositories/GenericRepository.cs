@@ -39,6 +39,7 @@ namespace PV521_BooksShop.DAL.Repositories
 
         public async Task<bool> UpdateAsync(TEntity entity)
         {
+            entity.Updated = DateTime.UtcNow;
             _context.Set<TEntity>().Update(entity);
             var res = await _context.SaveChangesAsync();
             return res > 0;
