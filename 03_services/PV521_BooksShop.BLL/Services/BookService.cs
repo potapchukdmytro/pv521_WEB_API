@@ -36,7 +36,16 @@ namespace PV521_BooksShop.BLL.Services
 
             var dtos = _mapper.Map<IEnumerable<BookDto>>(entities);
 
-            return ServiceResponseDto.Success("Книги отримано", dtos);
+            var paginationResponse = new PaginationResponseDto<BookDto>
+            {
+                Items = dtos,
+                Page = dto.Page,
+                PageSize = dto.PageSize,
+                Total = total,
+                PageCount = pages
+            };
+
+            return ServiceResponseDto.Success("Книги отримано", paginationResponse);
         }
 
         public async Task<ServiceResponseDto> GetByIdAsync(int id)
