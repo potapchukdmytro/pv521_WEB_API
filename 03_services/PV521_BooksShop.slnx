@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="PV521_BooksShop.BLL/PV521_BooksShop.BLL.csproj" />
+  <Project Path="PV521_BooksShop.DAL/PV521_BooksShop.DAL.csproj" />
+  <Project Path="PV521_BooksShop/PV521_BooksShop.csproj" />
+</Solution>
