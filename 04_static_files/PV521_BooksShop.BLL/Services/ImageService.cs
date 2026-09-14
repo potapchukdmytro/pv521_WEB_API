@@ -31,5 +31,13 @@ namespace PV521_BooksShop.BLL.Services
                 return null;
             }
         }
+
+        public void Remove(string path)
+        {
+            if(File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
     }
 }

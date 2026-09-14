@@ -40,7 +40,7 @@ namespace PV521_BooksShop.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync([FromRoute] int id)
         {
-            var response = await _bookService.DeleteAsync(id);
+            var response = await _bookService.DeleteAsync(id, _imagesPath);
             return this.GetHttpResponse(response);
         }
 
@@ -54,9 +54,9 @@ namespace PV521_BooksShop.Controllers
 
         // Update
         [HttpPut]
-        public async Task<IActionResult> UpdateAsync([FromBody] UpdateBookDto dto)
+        public async Task<IActionResult> UpdateAsync([FromForm] UpdateBookDto dto)
         {
-            var response = await _bookService.UpdateAsync(dto);
+            var response = await _bookService.UpdateAsync(dto, _imagesPath);
             return this.GetHttpResponse(response);
         }
     }

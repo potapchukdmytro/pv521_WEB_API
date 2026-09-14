@@ -63,9 +63,21 @@ namespace PV521_BooksShop.BLL.Services
             return ServiceResponseDto.Success("Книгу отримано", dto);
         }
 
-        public async Task<ServiceResponseDto> DeleteAsync(int id)
+        public async Task<ServiceResponseDto> DeleteAsync(int id, string imagesPath)
         {
-            bool res = await _bookRepostiory.DeleteAsync(id);
+            var entity = await _bookRepostiory.GetByIdAsync(id);
+
+            if(entity == null)
+            {
+                return ServiceResponseDto.Error($"Книгу з id '{id}' не знайдено");
+            }
+
+            if(entity.Image != null)
+            {
+                _imageService.Remove(Path.Combine(imagesPath, entity.Image));
+            }
+
+            bool res = await _bookRepostiory.DeleteAsync(entity);
 
             if (res)
             {
@@ -100,7 +112,7 @@ namespace PV521_BooksShop.BLL.Services
             return ServiceResponseDto.Success("Книгу додано", _mapper.Map<BookDto>(entity));
         }
 
-        public async Task<ServiceResponseDto> UpdateAsync(UpdateBookDto dto)
+        public async Task<ServiceResponseDto> UpdateAsync(UpdateBookDto dto, string imagesPath)
         {
             if (string.IsNullOrEmpty(dto.Title))
             {
@@ -115,6 +127,16 @@ namespace PV521_BooksShop.BLL.Services
             }
 
             _mapper.Map(dto, entity);
+
+            if(dto.Image != null)
+            {
+                if(entity.Image != null)
+                {
+                    _imageService.Remove(Path.Combine(imagesPath, entity.Image));
+                }
+
+                entity.Image = await _imageService.SaveAsync(dto.Image, imagesPath);
+            }
 
             bool res = await _bookRepostiory.UpdateAsync(entity);
 
