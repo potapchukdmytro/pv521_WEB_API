@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PV521_BooksShop.BLL.Dtos;
-using PV521_BooksShop.BLL.Dtos.Author;
 using PV521_BooksShop.BLL.Dtos.Book;
 using PV521_BooksShop.BLL.Dtos.Pagination;
 using PV521_BooksShop.DAL.Entities;
@@ -12,12 +11,14 @@ namespace PV521_BooksShop.BLL.Services
     public class BookService
     {
         private readonly BookRepostiory _bookRepostiory;
+        private readonly ImageService _imageService;
         private readonly IMapper _mapper;
 
-        public BookService(BookRepostiory bookRepostiory, IMapper mapper)
+        public BookService(BookRepostiory bookRepostiory, IMapper mapper, ImageService imageService)
         {
             _bookRepostiory = bookRepostiory;
             _mapper = mapper;
+            _imageService = imageService;
         }
 
         public async Task<ServiceResponseDto> GetAllAsync(PaginationRequestDto dto)
@@ -52,7 +53,7 @@ namespace PV521_BooksShop.BLL.Services
         {
             var entity = await _bookRepostiory.GetByIdAsync(id, true);
 
-            if(entity == null)
+            if (entity == null)
             {
                 return ServiceResponseDto.Error($"Книгу з id '{id}' не знайдено");
             }
@@ -66,7 +67,7 @@ namespace PV521_BooksShop.BLL.Services
         {
             bool res = await _bookRepostiory.DeleteAsync(id);
 
-            if(res)
+            if (res)
             {
                 return ServiceResponseDto.Success("Книгу видалено");
             }
@@ -74,18 +75,24 @@ namespace PV521_BooksShop.BLL.Services
             return ServiceResponseDto.Success("Не вдалося видалити книгу");
         }
 
-        public async Task<ServiceResponseDto> CreateAsync(CreateBookDto dto)
+        public async Task<ServiceResponseDto> CreateAsync(CreateBookDto dto, string imagesPath)
         {
-            if(string.IsNullOrEmpty(dto.Title))
+            if (string.IsNullOrEmpty(dto.Title))
             {
                 return ServiceResponseDto.Error("Назва книги є обов'язковою");
             }
 
             var entity = _mapper.Map<Book>(dto);
 
+            if(dto.Image != null)
+            {
+                // Save image
+                entity.Image = await _imageService.SaveAsync(dto.Image, imagesPath);
+            }
+
             bool res = await _bookRepostiory.CreateAsync(entity);
 
-            if(!res)
+            if (!res)
             {
                 return ServiceResponseDto.Success("Не вдалося додати книгу");
             }
@@ -102,7 +109,7 @@ namespace PV521_BooksShop.BLL.Services
 
             var entity = await _bookRepostiory.GetByIdAsync(dto.Id);
 
-            if(entity == null)
+            if (entity == null)
             {
                 return ServiceResponseDto.Error($"Книгу з id '{dto.Id}' не знайдено");
             }

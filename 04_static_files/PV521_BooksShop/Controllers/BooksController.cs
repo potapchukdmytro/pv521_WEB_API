@@ -3,6 +3,7 @@ using PV521_BooksShop.BLL.Dtos.Book;
 using PV521_BooksShop.BLL.Dtos.Pagination;
 using PV521_BooksShop.BLL.Services;
 using PV521_BooksShop.Extensions;
+using PV521_BooksShop.Settings;
 
 namespace PV521_BooksShop.Controllers
 {
@@ -11,10 +12,12 @@ namespace PV521_BooksShop.Controllers
     public class BooksController : ControllerBase
     {
         private readonly BookService _bookService;
+        private readonly string _imagesPath;
 
-        public BooksController(BookService bookService)
+        public BooksController(BookService bookService, IWebHostEnvironment env)
         {
             _bookService = bookService;
+            _imagesPath = Path.Combine(env.ContentRootPath, PathSettings.Books);
         }
 
         // All
@@ -43,9 +46,9 @@ namespace PV521_BooksShop.Controllers
 
         // Create
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateBookDto dto)
+        public async Task<IActionResult> CreateAsync([FromForm] CreateBookDto dto)
         {
-            var response = await _bookService.CreateAsync(dto);
+            var response = await _bookService.CreateAsync(dto, _imagesPath);
             return this.GetHttpResponse(response);
         }
 

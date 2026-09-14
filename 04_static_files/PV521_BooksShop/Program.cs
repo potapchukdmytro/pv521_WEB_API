@@ -3,6 +3,7 @@ using PV521_BooksShop.BLL.Services;
 using PV521_BooksShop.DAL;
 using PV521_BooksShop.DAL.Initializer;
 using PV521_BooksShop.DAL.Repositories;
+using PV521_BooksShop.Infrastructure;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,7 @@ builder.Services.AddScoped<AuthorRepository>();
 
 // Add services
 builder.Services.AddScoped<BookService>();
+builder.Services.AddScoped<ImageService>();
 
 var app = builder.Build();
 
@@ -45,6 +47,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+// Static files
+app.AddStaticFiles(app.Environment);
 
 app.MapControllers();
 

@@ -1,4 +1,6 @@
-﻿namespace PV521_BooksShop.BLL.Dtos.Book
+﻿using Microsoft.AspNetCore.Http;
+
+namespace PV521_BooksShop.BLL.Dtos.Book
 {
     public class CreateBookDto
     {
@@ -8,6 +10,7 @@
         public decimal Price { get; set; }
         public int Pages { get; set; }
         public int Year { get; set; }
+        public IFormFile? Image { get; set; }
         public int? AuthorId { get; set; }
     }
 }
