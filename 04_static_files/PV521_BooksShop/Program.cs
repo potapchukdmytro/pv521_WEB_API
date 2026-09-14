@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen();
 
 // Add dbcontext
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -38,11 +39,22 @@ builder.Services.AddScoped<ImageService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
+//{
+//    app.MapOpenApi();
+//    app.MapScalarApiReference();
+//}
+
+app.MapOpenApi();
+app.MapScalarApiReference(options =>
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+    options
+        .WithOpenApiRoutePattern("/openapi/{documentName}.json")
+        .WithBundleUrl("https://cdn.jsdelivr.net/npm/@scalar/api-reference");
+});
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
