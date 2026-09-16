@@ -21,9 +21,9 @@ namespace PV521_BooksShop.BLL.Services
             _imageService = imageService;
         }
 
-        public async Task<ServiceResponseDto> GetAllAsync(PaginationRequestDto dto)
+        public async Task<ServiceResponseDto> GetAllAsync(PaginationRequestDto dto, CancellationToken ct = default)
         {
-            int total = await _bookRepostiory.Books.CountAsync();
+            int total = await _bookRepostiory.Books.CountAsync(ct);
             dto.PageSize = dto.PageSize < 1 ? 50 : dto.PageSize;
 
             int pages = (int)Math.Ceiling((double)total / dto.PageSize);
@@ -33,7 +33,7 @@ namespace PV521_BooksShop.BLL.Services
                 .Include(b => b.Author)
                 .Skip((dto.Page - 1) * dto.PageSize)
                 .Take(dto.PageSize)
-                .ToListAsync();
+                .ToListAsync(ct);
 
             var dtos = _mapper.Map<IEnumerable<BookDto>>(entities);
 
@@ -49,9 +49,9 @@ namespace PV521_BooksShop.BLL.Services
             return ServiceResponseDto.Success("Книги отримано", paginationResponse);
         }
 
-        public async Task<ServiceResponseDto> GetByIdAsync(int id)
+        public async Task<ServiceResponseDto> GetByIdAsync(int id, CancellationToken ct = default)
         {
-            var entity = await _bookRepostiory.GetByIdAsync(id, true);
+            var entity = await _bookRepostiory.GetByIdAsync(id, true, ct);
 
             if (entity == null)
             {
@@ -63,9 +63,9 @@ namespace PV521_BooksShop.BLL.Services
             return ServiceResponseDto.Success("Книгу отримано", dto);
         }
 
-        public async Task<ServiceResponseDto> DeleteAsync(int id, string imagesPath)
+        public async Task<ServiceResponseDto> DeleteAsync(int id, string imagesPath, CancellationToken ct = default)
         {
-            var entity = await _bookRepostiory.GetByIdAsync(id);
+            var entity = await _bookRepostiory.GetByIdAsync(id, ct);
 
             if(entity == null)
             {
@@ -77,7 +77,7 @@ namespace PV521_BooksShop.BLL.Services
                 _imageService.Remove(Path.Combine(imagesPath, entity.Image));
             }
 
-            bool res = await _bookRepostiory.DeleteAsync(entity);
+            bool res = await _bookRepostiory.DeleteAsync(entity, ct);
 
             if (res)
             {
@@ -87,17 +87,17 @@ namespace PV521_BooksShop.BLL.Services
             return ServiceResponseDto.Success("Не вдалося видалити книгу");
         }
 
-        public async Task<ServiceResponseDto> CreateAsync(CreateBookDto dto, string imagesPath)
+        public async Task<ServiceResponseDto> CreateAsync(CreateBookDto dto, string imagesPath, CancellationToken ct = default)
         {
             var entity = _mapper.Map<Book>(dto);
 
             if(dto.Image != null)
             {
                 // Save image
-                entity.Image = await _imageService.SaveAsync(dto.Image, imagesPath);
+                entity.Image = await _imageService.SaveAsync(dto.Image, imagesPath, ct);
             }
 
-            bool res = await _bookRepostiory.CreateAsync(entity);
+            bool res = await _bookRepostiory.CreateAsync(entity, ct);
 
             if (!res)
             {
@@ -107,9 +107,9 @@ namespace PV521_BooksShop.BLL.Services
             return ServiceResponseDto.Success("Книгу додано", _mapper.Map<BookDto>(entity));
         }
 
-        public async Task<ServiceResponseDto> UpdateAsync(UpdateBookDto dto, string imagesPath)
+        public async Task<ServiceResponseDto> UpdateAsync(UpdateBookDto dto, string imagesPath, CancellationToken ct = default)
         {
-            var entity = await _bookRepostiory.GetByIdAsync(dto.Id);
+            var entity = await _bookRepostiory.GetByIdAsync(dto.Id, ct);
 
             if (entity == null)
             {
@@ -125,10 +125,10 @@ namespace PV521_BooksShop.BLL.Services
                     _imageService.Remove(Path.Combine(imagesPath, entity.Image));
                 }
 
-                entity.Image = await _imageService.SaveAsync(dto.Image, imagesPath);
+                entity.Image = await _imageService.SaveAsync(dto.Image, imagesPath, ct);
             }
 
-            bool res = await _bookRepostiory.UpdateAsync(entity);
+            bool res = await _bookRepostiory.UpdateAsync(entity, ct);
 
             if (!res)
             {

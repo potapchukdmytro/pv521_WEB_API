@@ -14,13 +14,13 @@ namespace PV521_BooksShop.DAL.Repositories
 
         public IQueryable<Book> Books => GetAll();
 
-        public async Task<Book?> GetByIdAsync(int id, bool include = false)
+        public async Task<Book?> GetByIdAsync(int id, bool include = false, CancellationToken ct = default)
         {
-            var entity =  await base.GetByIdAsync(id);
+            var entity =  await base.GetByIdAsync(id,ct);
 
             if (include && entity != null)
             {
-                await _context.Entry(entity).Reference(e => e.Author).LoadAsync();
+                await _context.Entry(entity).Reference(e => e.Author).LoadAsync(ct);
             }
 
             return entity;

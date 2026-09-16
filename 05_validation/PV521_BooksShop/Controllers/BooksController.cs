@@ -27,31 +27,31 @@ namespace PV521_BooksShop.Controllers
 
         // All
         [HttpGet]
-        public async Task<IActionResult> GetAsync([FromQuery] PaginationRequestDto dto)
+        public async Task<IActionResult> GetAsync([FromQuery] PaginationRequestDto dto, CancellationToken ct = default)
         {
-            var response = await _bookService.GetAllAsync(dto);
+            var response = await _bookService.GetAllAsync(dto, ct);
             return this.GetHttpResponse(response);
         }
 
         // ById
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAsync([FromRoute] int id)
+        public async Task<IActionResult> GetAsync([FromRoute] int id, CancellationToken ct = default)
         {
-            var response = await _bookService.GetByIdAsync(id);
+            var response = await _bookService.GetByIdAsync(id, ct);
             return this.GetHttpResponse(response);
         }
 
         // Delete
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync([FromRoute] int id)
+        public async Task<IActionResult> DeleteAsync([FromRoute] int id, CancellationToken ct = default)
         {
-            var response = await _bookService.DeleteAsync(id, _imagesPath);
+            var response = await _bookService.DeleteAsync(id, _imagesPath, ct);
             return this.GetHttpResponse(response);
         }
 
         // Create
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromForm] CreateBookDto dto)
+        public async Task<IActionResult> CreateAsync([FromForm] CreateBookDto dto, CancellationToken ct = default)
         {
             var validation = _validatiorCreate.Validate(dto);
 
@@ -60,13 +60,13 @@ namespace PV521_BooksShop.Controllers
                 return this.GetValiationErrorResponse(validation);
             }
 
-            var response = await _bookService.CreateAsync(dto, _imagesPath);
+            var response = await _bookService.CreateAsync(dto, _imagesPath, ct);
             return this.GetHttpResponse(response);
         }
 
         // Update
         [HttpPut]
-        public async Task<IActionResult> UpdateAsync([FromForm] UpdateBookDto dto)
+        public async Task<IActionResult> UpdateAsync([FromForm] UpdateBookDto dto, CancellationToken ct = default)
         {
             var validation = _validatiorUpdate.Validate(dto);
 
@@ -75,7 +75,7 @@ namespace PV521_BooksShop.Controllers
                 return this.GetValiationErrorResponse(validation);
             }
 
-            var response = await _bookService.UpdateAsync(dto, _imagesPath);
+            var response = await _bookService.UpdateAsync(dto, _imagesPath, ct);
             return this.GetHttpResponse(response);
         }
     }

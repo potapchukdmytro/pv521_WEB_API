@@ -4,7 +4,7 @@ namespace PV521_BooksShop.BLL.Services
 {
     public class ImageService
     {
-        public async Task<string?> SaveAsync(IFormFile file, string path)
+        public async Task<string?> SaveAsync(IFormFile file, string path, CancellationToken ct = default)
         {
             try
             {
@@ -21,7 +21,7 @@ namespace PV521_BooksShop.BLL.Services
 
                 using (var fileStream = new FileStream(imagePath, FileMode.Create))
                 {
-                    await file.CopyToAsync(fileStream);
+                    await file.CopyToAsync(fileStream, ct);
                 }
 
                 return imageName;
