@@ -1,11 +1,13 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using PV521_BooksShop.BLL.Dtos.Book;
+using PV521_BooksShop.DAL.Repositories;
 
 namespace PV521_BooksShop.BLL.Validators.Book
 {
     public class CreateBookValidator : AbstractValidator<CreateBookDto>
     {
-        public CreateBookValidator()
+        public CreateBookValidator(AuthorRepository authorRepository)
         {
             RuleFor(x => x.Title)
                 .NotEmpty().WithMessage("Назва книги є обов'язковою")
@@ -22,10 +24,16 @@ namespace PV521_BooksShop.BLL.Validators.Book
             RuleFor(x => x.Pages)
                 .GreaterThan(0).WithMessage("К-сть сторінок не може бути меншою за 1")
                 .LessThanOrEqualTo(int.MaxValue).WithMessage($"К-сть сторінок не може бути більшою за {int.MaxValue}");
-            
+
             RuleFor(x => x.Year)
                 .GreaterThan(0).WithMessage("Рік не може бути меншим за 1")
                 .LessThanOrEqualTo(DateTime.UtcNow.Year).WithMessage($"Рік не може бути більшим за {DateTime.UtcNow.Year}");
+
+            //RuleFor(x => x.AuthorId)
+            //    .MustAsync(async (authorId, cancellationToken) =>
+            //    {
+            //        return await authorRepository.Authors.AnyAsync(a => a.Id == authorId, cancellationToken);
+            //    }).WithMessage(x => $"Автор з id '{x.AuthorId}' не існує");
         }
     }
 }

@@ -58,12 +58,7 @@ var app = builder.Build();
 //}
 
 app.MapOpenApi();
-app.MapScalarApiReference(options =>
-{
-    options
-        .WithOpenApiRoutePattern("/openapi/{documentName}.json")
-        .WithBundleUrl("https://cdn.jsdelivr.net/npm/@scalar/api-reference");
-});
+app.MapScalarApiReference();
 
 app.UseSwagger();
 app.UseSwaggerUI();

@@ -89,11 +89,6 @@ namespace PV521_BooksShop.BLL.Services
 
         public async Task<ServiceResponseDto> CreateAsync(CreateBookDto dto, string imagesPath)
         {
-            if (string.IsNullOrEmpty(dto.Title))
-            {
-                return ServiceResponseDto.Error("Назва книги є обов'язковою");
-            }
-
             var entity = _mapper.Map<Book>(dto);
 
             if(dto.Image != null)
@@ -114,11 +109,6 @@ namespace PV521_BooksShop.BLL.Services
 
         public async Task<ServiceResponseDto> UpdateAsync(UpdateBookDto dto, string imagesPath)
         {
-            if (string.IsNullOrEmpty(dto.Title))
-            {
-                return ServiceResponseDto.Error("Назва книги є обов'язковою");
-            }
-
             var entity = await _bookRepostiory.GetByIdAsync(dto.Id);
 
             if (entity == null)

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using PV521_BooksShop.BLL.Dtos;
 using PV521_BooksShop.BLL.Dtos.Book;
 using PV521_BooksShop.BLL.Dtos.Pagination;
 using PV521_BooksShop.BLL.Services;
