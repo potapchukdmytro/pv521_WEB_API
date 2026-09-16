@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using PV521_BooksShop.BLL.Dtos;
 using PV521_BooksShop.BLL.Dtos.Book;
 using PV521_BooksShop.BLL.Dtos.Pagination;
 using PV521_BooksShop.BLL.Services;
@@ -13,11 +15,15 @@ namespace PV521_BooksShop.Controllers
     {
         private readonly BookService _bookService;
         private readonly string _imagesPath;
+        private readonly IValidator<CreateBookDto> _validatiorCreate;
+        private readonly IValidator<UpdateBookDto> _validatiorUpdate;
 
-        public BooksController(BookService bookService, IWebHostEnvironment env)
+        public BooksController(BookService bookService, IWebHostEnvironment env, IValidator<CreateBookDto> validatiorCreate, IValidator<UpdateBookDto> validatiorUpdate)
         {
             _bookService = bookService;
             _imagesPath = Path.Combine(env.ContentRootPath, PathSettings.Books);
+            _validatiorCreate = validatiorCreate;
+            _validatiorUpdate = validatiorUpdate;
         }
 
         // All
@@ -48,6 +54,13 @@ namespace PV521_BooksShop.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromForm] CreateBookDto dto)
         {
+            var validation = _validatiorCreate.Validate(dto);
+
+            if (!validation.IsValid)
+            {
+                return this.GetValiationErrorResponse(validation);
+            }
+
             var response = await _bookService.CreateAsync(dto, _imagesPath);
             return this.GetHttpResponse(response);
         }
@@ -56,6 +69,13 @@ namespace PV521_BooksShop.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateAsync([FromForm] UpdateBookDto dto)
         {
+            var validation = _validatiorUpdate.Validate(dto);
+
+            if (!validation.IsValid)
+            {
+                return this.GetValiationErrorResponse(validation);
+            }
+
             var response = await _bookService.UpdateAsync(dto, _imagesPath);
             return this.GetHttpResponse(response);
         }

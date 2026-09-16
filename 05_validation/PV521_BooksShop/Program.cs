@@ -1,5 +1,8 @@
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PV521_BooksShop.BLL.Services;
+using PV521_BooksShop.BLL.Validators.Book;
 using PV521_BooksShop.DAL;
 using PV521_BooksShop.DAL.Initializer;
 using PV521_BooksShop.DAL.Repositories;
@@ -35,6 +38,15 @@ builder.Services.AddScoped<AuthorRepository>();
 // Add services
 builder.Services.AddScoped<BookService>();
 builder.Services.AddScoped<ImageService>();
+
+// Disable default validation
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
+// Add fluent validation
+builder.Services.AddValidatorsFromAssemblyContaining<CreateBookValidator>();
 
 var app = builder.Build();
 
