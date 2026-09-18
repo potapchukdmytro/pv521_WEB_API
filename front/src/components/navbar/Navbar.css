@@ -1,0 +1,144 @@
+.navbar {
+    width: 100%;
+    height: 72px;
+    background: #ffffff;
+    border-bottom: 1px solid #e8ecf2;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-container {
+    max-width: 1240px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    text-decoration: none;
+    color: #172033;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.navbar-logo-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #4f46e5;
+    color: #ffffff;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar-link {
+    padding: 10px 14px;
+    border-radius: 8px;
+
+    text-decoration: none;
+    color: #667085;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    transition: 0.2s;
+}
+
+.navbar-link:hover {
+    color: #4f46e5;
+    background: #f5f4ff;
+}
+
+.navbar-link.active {
+    color: #4f46e5;
+    background: #eeecff;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-search-button {
+    width: 42px;
+    height: 42px;
+
+    border: none;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+    color: #667085;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.navbar-search-button:hover {
+    background: #f4f6f8;
+    color: #4f46e5;
+}
+
+.navbar-profile {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    border: none;
+    background: transparent;
+
+    color: #344054;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.navbar-avatar {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f0efff;
+    color: #4f46e5;
+}
+
+@media (max-width: 800px) {
+    .navbar-links {
+        display: none;
+    }
+
+    .navbar-profile span {
+        display: none;
+    }
+}
