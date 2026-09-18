@@ -13,6 +13,15 @@ namespace PV521_BooksShop.BLL.Validators.Book
                 .NotEmpty().WithMessage("Назва книги є обов'язковою")
                 .MaximumLength(255).WithMessage("Максимальна довжина 255 символів");
 
+            RuleFor(x => x.Language)
+                .MaximumLength(50).WithMessage("Максимальна довжина 50 символів");
+
+            RuleFor(x => x.Isbn)
+                .MaximumLength(25).WithMessage("Максимальна довжина 25 символів");
+
+            RuleFor(x => x.Publisher)
+                .MaximumLength(100).WithMessage("Максимальна довжина 100 символів");
+
             RuleFor(x => x.Rating)
                 .GreaterThanOrEqualTo(0).WithMessage("Рейтинг повинен бути від 0 до 10")
                 .LessThanOrEqualTo(10).WithMessage("Рейтинг повинен бути від 0 до 10");

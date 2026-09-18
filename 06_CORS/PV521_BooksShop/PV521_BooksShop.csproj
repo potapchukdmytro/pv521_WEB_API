@@ -22,7 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Storage\" />
+    <Content Update="Storage\authors-books.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

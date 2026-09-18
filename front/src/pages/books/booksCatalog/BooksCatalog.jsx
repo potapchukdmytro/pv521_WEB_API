@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import "./BooksCatalog.css";
 import { env } from "../../../env";
 import axios from "axios";
+import { Link } from "react-router";
 
 const BooksCatalog = () => {
     const [page, setPage] = useState(1);
+    const [sortBy, setSortBy] = useState("created");
     const [payload, setPayload] = useState({
         page: 1,
         pageSize: 40,
@@ -13,8 +15,8 @@ const BooksCatalog = () => {
         items: [],
     });
 
-    const fetchBooks = async (page = 1, pageSize = 40) => {
-        const url = `${env.apiUrl}/books?page=${page}&pageSize=${pageSize}`;
+    const fetchBooks = async (pageSize = 40) => {
+        const url = `${env.apiUrl}/books?page=${page}&pageSize=${pageSize}&sortBy=${sortBy}`;
         try {
             const response = await axios.get(url);
             const { data } = response;
@@ -24,9 +26,14 @@ const BooksCatalog = () => {
         }
     };
 
+    const changeSortValue = (event) => {
+        const select = event.target;
+        setSortBy(select.value);
+    };
+
     useEffect(() => {
-        fetchBooks(page);
-    }, [page]);
+        fetchBooks();
+    }, [page, sortBy]);
 
     return (
         <main className="catalog">
@@ -73,11 +80,15 @@ const BooksCatalog = () => {
                         <button className="category">IT</button>
                     </div>
 
-                    <select className="catalog-sort">
-                        <option>Нові книги</option>
-                        <option>Ціна: від дешевих</option>
-                        <option>Ціна: від дорогих</option>
-                        <option>За рейтингом</option>
+                    <select
+                        className="catalog-sort"
+                        value={sortBy}
+                        onChange={changeSortValue}
+                    >
+                        <option value="created">Нові книги</option>
+                        <option value="priceasc">Ціна: від дешевих</option>
+                        <option value="pricedesc">Ціна: від дорогих</option>
+                        <option value="rating">За рейтингом</option>
                     </select>
                 </section>
 
@@ -128,16 +139,23 @@ const BooksCatalog = () => {
                                 <div className="book-footer">
                                     <strong>{book.price} ₴</strong>
 
-                                    <button className="book-details">
+                                    <Link
+                                        to={`/book/${book.id}`}
+                                        className="book-details"
+                                    >
                                         Детальніше
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         </article>
                     ))}
                 </section>
 
-                <Pagination currentPage={page} onPageChange={setPage} totalPages={payload.pageCount} />
+                <Pagination
+                    currentPage={page}
+                    onPageChange={setPage}
+                    totalPages={payload.pageCount}
+                />
             </div>
         </main>
     );

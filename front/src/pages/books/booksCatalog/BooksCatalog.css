@@ -337,6 +337,8 @@ select {
     cursor: pointer;
 
     transition: 0.2s;
+
+    text-decoration: none;
 }
 
 .book-details:hover {

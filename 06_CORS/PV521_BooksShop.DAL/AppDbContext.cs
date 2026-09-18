@@ -32,6 +32,18 @@ namespace PV521_BooksShop.DAL
 
                 e.Property(b => b.Image)
                 .HasMaxLength(100);
+
+                e.Property(b => b.Image)
+                .HasMaxLength(100);
+
+                e.Property(b => b.Language)
+                .HasMaxLength(50);
+
+                e.Property(b => b.Isbn)
+                .HasMaxLength(25);
+
+                e.Property(b => b.Publisher)
+                .HasMaxLength(100);
             });
 
             // Author

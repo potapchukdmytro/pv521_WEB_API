@@ -35,8 +35,8 @@ namespace PV521_BooksShop.BLL.Services
             entities = sortBy.ToLower() switch
             {
                 "created" => entities.OrderByDescending(e => e.Created),
-                "priceAsc" => entities.OrderBy(e => e.Price),
-                "priceDesc" => entities.OrderByDescending(e => e.Price),
+                "priceasc" => entities.OrderBy(e => e.Price),
+                "pricedesc" => entities.OrderByDescending(e => e.Price),
                 "rating" => entities.OrderByDescending(e => e.Rating),
                 _ => entities.OrderBy(e => e.Id)
             };
