@@ -3,6 +3,7 @@ using PV521_BooksShop.BLL.Dtos;
 using PV521_BooksShop.BLL.Dtos.User;
 using PV521_BooksShop.BLL.Services;
 using PV521_BooksShop.Extensions;
+using PV521_BooksShop.Settings;
 
 namespace PV521_BooksShop.Controllers
 {
@@ -11,10 +12,12 @@ namespace PV521_BooksShop.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly string _imagesPath;
 
-        public UserController(UserService userService)
+        public UserController(UserService userService, IWebHostEnvironment env)
         {
             _userService = userService;
+            _imagesPath = Path.Combine(env.ContentRootPath, PathSettings.Users);
         }
 
         [HttpGet]
@@ -39,7 +42,9 @@ namespace PV521_BooksShop.Controllers
                 return BadRequest(ServiceResponseDto.Error("Зображення є обов'язковим"));
             }
 
-            return Ok();
+            var response = await _userService.SetAvatarAsync(dto, _imagesPath, ct);
+
+            return this.GetHttpResponse(response);
         }
     }
 }

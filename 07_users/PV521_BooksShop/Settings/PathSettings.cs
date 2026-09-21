@@ -5,5 +5,6 @@
         public static string Storage => "Storage";
         public static string Images => Path.Combine(Storage, "Images");
         public static string Books => Path.Combine(Images, "books");
+        public static string Users => Path.Combine(Images, "users");
     }
 }

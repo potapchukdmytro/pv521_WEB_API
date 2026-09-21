@@ -45,6 +45,7 @@ builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PasswordHasher<User>>();
+builder.Services.AddScoped<AuthService>();
 
 // Disable default validation
 builder.Services.Configure<ApiBehaviorOptions>(options =>

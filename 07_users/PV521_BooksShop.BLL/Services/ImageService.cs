@@ -15,6 +15,11 @@ namespace PV521_BooksShop.BLL.Services
                     return null;
                 }
 
+                if(!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
                 var ext = Path.GetExtension(file.FileName);
                 var imageName = $"{Guid.NewGuid()}{ext}";
                 var imagePath = Path.Combine(path, imageName);

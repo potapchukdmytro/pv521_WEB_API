@@ -13,13 +13,15 @@ namespace PV521_BooksShop.BLL.Services
     {
         private readonly UserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly ImageService _imageService;
         private readonly PasswordHasher<User> _passwordHasher;
 
-        public UserService(UserRepository userRepository, IMapper mapper, PasswordHasher<User> passwordHasher)
+        public UserService(UserRepository userRepository, IMapper mapper, PasswordHasher<User> passwordHasher, ImageService imageService)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
+            _imageService = imageService;
         }
 
         public async Task<ServiceResponseDto> GetAllAsync(CancellationToken ct = default)
@@ -61,6 +63,27 @@ namespace PV521_BooksShop.BLL.Services
 
             return result == PasswordVerificationResult.Success
                 || result == PasswordVerificationResult.SuccessRehashNeeded;
+        }
+
+        public async Task<ServiceResponseDto> SetAvatarAsync(SetAvatarDto dto, string imagesPath, CancellationToken ct = default)
+        {
+            var user = await _userRepository.GetByIdAsync(dto.UserId, ct);
+
+            if(user == null)
+            {
+                return ServiceResponseDto.Error($"Користувач з id '{dto.UserId}' не знайдений");
+            }
+
+            if(user.Image != null)
+            {
+                _imageService.Remove(Path.Combine(imagesPath, user.Image));
+            }
+
+            user.Image = await _imageService.SaveAsync(dto.Image, imagesPath, ct);
+
+            await _userRepository.UpdateAsync(user, ct);
+
+            return ServiceResponseDto.Success("Зображення користувача оновлено");
         }
     }
 }

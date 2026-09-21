@@ -17,7 +17,7 @@ namespace PV521_BooksShop.Extensions
 
             foreach (var error in validation.Errors)
             {
-                errors.Add(error.PropertyName, error.ErrorMessage);
+                errors.TryAdd(error.PropertyName, error.ErrorMessage);
             }
 
             var responseDto = new ServiceResponseDto
