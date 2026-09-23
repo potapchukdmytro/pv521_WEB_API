@@ -1,0 +1,21 @@
+﻿using Microsoft.AspNetCore.Http;
+
+namespace PV521_BooksShop.BLL.Dtos.Book
+{
+    public class UpdateBookDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public int Rating { get; set; }
+        public decimal Price { get; set; }
+        public int Pages { get; set; }
+        public int Year { get; set; }
+        public IFormFile? Image { get; set; }
+        public int? AuthorId { get; set; }
+        public int Reviews { get; set; }
+        public string? Language { get; set; }
+        public string? Publisher { get; set; }
+        public string? Isbn { get; set; }
+    }
+}
