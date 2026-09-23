@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using PV521_BooksShop.BLL.Settings;
 using PV521_BooksShop.DAL.Entities;
+using PV521_BooksShop.DAL.Migrations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -38,7 +39,7 @@ namespace PV521_BooksShop.BLL.Services
             var token = new JwtSecurityToken(
                 issuer: _settings.Issuer,
                 audience: _settings.Audience,
-                expires: DateTime.UtcNow.AddMinutes(_settings.ExpHours),
+                expires: DateTime.UtcNow.AddHours(_settings.ExpHours),
                 claims: claims,
                 signingCredentials: creds
                 );
@@ -75,6 +76,31 @@ namespace PV521_BooksShop.BLL.Services
             {
                 return false;
             }
+        }
+
+        public int GetUserId(string token)
+        {
+            bool isValid = ValidateAccessToken(token);
+
+            if(!isValid)
+            {
+                throw new SecurityTokenArgumentException("Invalid token");
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+
+            if(!handler.CanReadToken(token))
+            {
+                throw new SecurityTokenArgumentException("Invalid token");
+            }
+
+            var jwt = handler.ReadJwtToken(token);
+            var idValue = (jwt.Claims.FirstOrDefault(c => c.Type == "id")?.Value) 
+                ?? throw new SecurityTokenArgumentException("Claim id not found");
+
+            bool parseRes = int.TryParse(idValue, out int userId);
+
+            return parseRes ? userId : throw new FormatException("User id incorrect");
         }
     }
 }

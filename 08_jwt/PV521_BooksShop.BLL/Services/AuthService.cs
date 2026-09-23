@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PV521_BooksShop.BLL.Dtos;
 using PV521_BooksShop.BLL.Dtos.Auth;
+using PV521_BooksShop.BLL.Dtos.User;
 using PV521_BooksShop.DAL.Entities;
 using PV521_BooksShop.DAL.Repositories;
 
@@ -40,6 +41,26 @@ namespace PV521_BooksShop.BLL.Services
             var token = _jwtService.GenerateAccessToken(user);
 
             return ServiceResponseDto.Success("Успішний вхід", token);
+        }
+
+        public async Task<ServiceResponseDto> UserDataAsync(string token, CancellationToken ct = default)
+        {
+            try
+            {
+                int userId = _jwtService.GetUserId(token);
+                var user = await _userRepository.GetByIdAsync(userId, ct);
+
+                if(user == null)
+                {
+                    return ServiceResponseDto.Error($"Користувач з id '{userId}' не знайдений");
+                }
+
+                return ServiceResponseDto.Success("Дані користувача отримано", _mapper.Map<UserDto>(user));
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<ServiceResponseDto> RegisterAsync(RegisterDto dto, CancellationToken ct = default)

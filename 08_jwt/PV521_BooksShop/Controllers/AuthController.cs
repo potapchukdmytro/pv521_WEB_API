@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using PV521_BooksShop.BLL.Dtos;
 using PV521_BooksShop.BLL.Dtos.Auth;
 using PV521_BooksShop.BLL.Services;
 using PV521_BooksShop.Extensions;
@@ -13,14 +14,12 @@ namespace PV521_BooksShop.Controllers
         private readonly AuthService _authService;
         private readonly IValidator<RegisterDto> _registerValidator;
         private readonly IValidator<LoginDto> _loginValidator;
-        private readonly JwtService _jwtService;
 
-        public AuthController(AuthService authService, IValidator<RegisterDto> registerValidator, IValidator<LoginDto> loginValidator, JwtService jwtService)
+        public AuthController(AuthService authService, IValidator<RegisterDto> registerValidator, IValidator<LoginDto> loginValidator)
         {
             _authService = authService;
             _registerValidator = registerValidator;
             _loginValidator = loginValidator;
-            _jwtService = jwtService;
         }
 
         [HttpPost("register")]
@@ -51,19 +50,26 @@ namespace PV521_BooksShop.Controllers
             return this.GetHttpResponse(response);
         }
 
-        [HttpPost("validate")]
-        public async Task<IActionResult> ValidateToken([FromBody] string token)
+        [HttpGet("me")]
+        public async Task<IActionResult> MeAsync(CancellationToken ct = default)
         {
-            bool res = _jwtService.ValidateAccessToken(token);
+            var authorization = Request.Headers.Authorization.ToString();
+            if(!authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                return Unauthorized(ServiceResponseDto.Error("Потрібен токен авторизації"));
+            }
 
-            if(res)
+            string token = authorization[7..].Trim();
+
+            try
             {
-                return Ok(res);
+                var response = await _authService.UserDataAsync(token, ct);
+                return this.GetHttpResponse(response);
             }
-            else
+            catch (Exception)
             {
-                return Unauthorized(res);
-            }
+                return Unauthorized(ServiceResponseDto.Error("Невалідний токен"));
+            }            
         }
     }
 }
