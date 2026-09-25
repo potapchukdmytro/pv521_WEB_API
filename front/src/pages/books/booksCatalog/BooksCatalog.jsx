@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import "./BooksCatalog.css";
 import { env } from "../../../env";
-import axios from "axios";
 import { Link } from "react-router";
+import { api } from "../../../api";
 
 const BooksCatalog = () => {
     const [page, setPage] = useState(1);
@@ -16,9 +16,9 @@ const BooksCatalog = () => {
     });
 
     const fetchBooks = async (pageSize = 40) => {
-        const url = `${env.apiUrl}/books?page=${page}&pageSize=${pageSize}&sortBy=${sortBy}`;
+        const url = `books?page=${page}&pageSize=${pageSize}&sortBy=${sortBy}`;
         try {
-            const response = await axios.get(url);
+            const response = await api.get(url);
             const { data } = response;
             setPayload(data.payload);
         } catch (error) {

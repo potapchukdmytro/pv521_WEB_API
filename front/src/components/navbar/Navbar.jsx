@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import "./Navbar.css";
 
 const Navbar = () => {
@@ -42,23 +43,27 @@ const Navbar = () => {
                         </svg>
                     </button>
 
-                    <button className="navbar-profile">
-                        <div className="navbar-avatar">
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                            >
-                                <path d="M20 21a8 8 0 0 0-16 0" />
-                                <circle cx="12" cy="7" r="4" />
-                            </svg>
-                        </div>
+                    {!localStorage.getItem("token") ? (
+                        <span className="navbar-profile">Увійти</span>
+                    ) : (
+                        <Link to="/profile" className="navbar-profile">
+                            <div className="navbar-avatar">
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                >
+                                    <path d="M20 21a8 8 0 0 0-16 0" />
+                                    <circle cx="12" cy="7" r="4" />
+                                </svg>
+                            </div>
 
-                        <span>Профіль</span>
-                    </button>
+                            <span>Профіль</span>
+                        </Link>
+                    )}
                 </div>
             </div>
         </header>
