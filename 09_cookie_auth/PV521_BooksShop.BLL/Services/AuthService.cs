@@ -12,14 +12,16 @@ namespace PV521_BooksShop.BLL.Services
         private readonly UserService _userService;
         private readonly UserRepository _userRepository;
         private readonly JwtService _jwtService;
+        private readonly EmailService _emailService;
         private readonly IMapper _mapper;
 
-        public AuthService(IMapper mapper, UserService userService, JwtService jwtService, UserRepository userRepository)
+        public AuthService(IMapper mapper, UserService userService, JwtService jwtService, UserRepository userRepository, EmailService emailService)
         {
             _mapper = mapper;
             _userService = userService;
             _jwtService = jwtService;
             _userRepository = userRepository;
+            _emailService = emailService;
         }
 
         public async Task<ServiceResponseDto> LoginAsync(LoginDto dto, CancellationToken ct = default)
@@ -72,6 +74,27 @@ namespace PV521_BooksShop.BLL.Services
             string token = _jwtService.GenerateAccessToken(user);
 
             return ServiceResponseDto.Success("Користувач успішно зареєстрований", token);
+        }
+
+        public async Task<ServiceResponseDto> SendConfirmEmailAsync(SendConfirmEmailDto dto, string callbackUrl, CancellationToken ct = default)
+        {
+            var user = await _userRepository.GetByEmailAsync(dto.Email, ct);
+
+            if(user == null)
+            {
+                return ServiceResponseDto.Error($"Користувач з поштою '{dto.Email}' не знайдений");
+            }
+
+            var emailConfirmToken = await _jwtService.GenerateEmailConfirmTokenAsync(user, ct);
+
+            await _emailService.SendEmailConfirmMessageAsync(user, emailConfirmToken, callbackUrl);
+
+            return ServiceResponseDto.Success("Лист відправлено");
+        }
+
+        public async Task<ServiceResponseDto> ConfirmEmailAsync(int userId, string token, CancellationToken ct = default)
+        {
+            return await _jwtService.ConfirmEmailAsync(userId, token, ct);
         }
     }
 }

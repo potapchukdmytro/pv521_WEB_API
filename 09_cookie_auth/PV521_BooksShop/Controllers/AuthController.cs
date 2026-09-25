@@ -28,17 +28,42 @@ namespace PV521_BooksShop.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto dto, CancellationToken ct = default)
+        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto dto, [FromQuery] bool authorization = true, CancellationToken ct = default)
         {
             var validation = await _registerValidator.ValidateAsync(dto, ct);
 
-            if(!validation.IsValid)
+            if (!validation.IsValid)
             {
                 return this.GetValiationErrorResponse(validation);
             }
 
             var response = await _authService.RegisterAsync(dto, ct);
-            return this.GetHttpResponse(response);
+
+            if (response.IsSuccess)
+            {
+                var token = response.Payload?.ToString();
+                if (token != null)
+                {
+                    if (authorization)
+                    {
+                        // Запис у cookie
+                        var options = new CookieOptions
+                        {
+                            HttpOnly = true,
+                            Secure = true,
+                            SameSite = SameSiteMode.None,
+                            Expires = DateTime.UtcNow.AddHours(_jwtSettings.ExpHours)
+                        };
+
+                        Response.Cookies.Append("accessToken", token, options);
+                    }
+
+                    response.Payload = null;
+                    return Ok(response);
+                }
+            }
+
+            return BadRequest(response);
         }
 
         [HttpPost("login")]
@@ -53,10 +78,10 @@ namespace PV521_BooksShop.Controllers
 
             var response = await _authService.LoginAsync(dto, ct);
 
-            if(response.IsSuccess)
+            if (response.IsSuccess)
             {
                 var token = response.Payload?.ToString();
-                if(token != null)
+                if (token != null)
                 {
                     // Запис у cookie
                     var options = new CookieOptions
@@ -71,7 +96,7 @@ namespace PV521_BooksShop.Controllers
 
                     response.Payload = null;
                     return Ok(response);
-                }   
+                }
             }
 
             return BadRequest(response);
@@ -83,7 +108,7 @@ namespace PV521_BooksShop.Controllers
         {
             var id = User.FindFirst("id")?.Value;
 
-            if(id == null)
+            if (id == null)
             {
                 return Unauthorized(ServiceResponseDto.Error("Невалідний токен"));
             }
@@ -98,7 +123,26 @@ namespace PV521_BooksShop.Controllers
             catch (Exception)
             {
                 return Unauthorized(ServiceResponseDto.Error("Невалідний токен"));
-            }            
+            }
+        }
+
+        [HttpPost("sendEmailConfirmMessage")]
+        public async Task<IActionResult> SendConfirmEmailAsync([FromBody] SendConfirmEmailDto dto, [FromQuery] string? callbackUrl, CancellationToken ct = default)
+        {
+            if(string.IsNullOrEmpty(callbackUrl))
+            {
+                callbackUrl = $"{Request.Scheme}://{Request.Host}/api/auth/confirmEmail";
+            }
+
+            var response = await _authService.SendConfirmEmailAsync(dto, callbackUrl, ct);
+            return this.GetHttpResponse(response);
+        }
+
+        [HttpGet("confirmEmail")]
+        public async Task<IActionResult> SendConfirmEmailAsyc([FromQuery] int uid, [FromQuery]  string token, CancellationToken ct = default)
+        {
+            var response = await _authService.ConfirmEmailAsync(uid, token, ct);
+            return this.GetHttpResponse(response);
         }
     }
 }

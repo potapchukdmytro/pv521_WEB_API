@@ -14,5 +14,7 @@
 
         public int? RoleId { get; set; }
         public Role? Role { get; set; }
+
+        public List<UserToken> Tokens { get; set; } = [];
     }
 }

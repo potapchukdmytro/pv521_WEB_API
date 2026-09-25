@@ -75,6 +75,7 @@ builder.Services.AddAutoMapper(cfg =>
 builder.Services.AddScoped<BookRepostiory>();
 builder.Services.AddScoped<AuthorRepository>();
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<UserTokenRepository>();
 
 // Add services
 builder.Services.AddScoped<BookService>();
@@ -84,9 +85,11 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PasswordHasher<User>>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<EmailService>();
 
 // Add settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 
 // Disable default validation
 builder.Services.Configure<ApiBehaviorOptions>(options =>
