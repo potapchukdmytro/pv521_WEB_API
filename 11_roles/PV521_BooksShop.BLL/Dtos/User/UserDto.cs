@@ -14,5 +14,10 @@ namespace PV521_BooksShop.BLL.Dtos.User
         public DateTime? BirthDate { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Role { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Id}: {UserName}\nEmail: {Email}\nName: {FirstName} {LastName}\nRole: {Role}";
+        }
     }
 }

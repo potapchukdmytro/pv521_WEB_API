@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PV521_BooksShop.BLL.Settings;
 using PV521_BooksShop.BLL.Validators.Book;
+using PV521_BooksShop.Configure;
 using PV521_BooksShop.DAL;
 using PV521_BooksShop.DAL.Initializer;
 using PV521_BooksShop.Infrastructure;
 using PV521_BooksShop.Middlewares;
+using PV521_BooksShop.Settings;
 using Scalar.AspNetCore;
+using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +47,7 @@ builder.Services
 // Add settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.Configure<BotSettings>(builder.Configuration.GetSection("BotSettings"));
 
 // Disable default validation
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -67,6 +71,13 @@ builder.Services.AddCors(opt =>
         .AllowCredentials();
     });
 });
+
+// Bot
+string botToken = builder.Configuration["BotSettings:Token"] ?? string.Empty;
+builder.Services.AddHttpClient("tgClient")
+    .AddTypedClient<ITelegramBotClient>(httpClient => new TelegramBotClient(botToken, httpClient));
+
+builder.Services.AddHostedService<ConfigureWebhook>();
 
 var app = builder.Build();
 
