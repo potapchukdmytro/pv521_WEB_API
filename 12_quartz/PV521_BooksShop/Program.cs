@@ -7,9 +7,12 @@ using PV521_BooksShop.Configure;
 using PV521_BooksShop.DAL;
 using PV521_BooksShop.DAL.Initializer;
 using PV521_BooksShop.Infrastructure;
+using PV521_BooksShop.Jobs;
 using PV521_BooksShop.Middlewares;
 using PV521_BooksShop.Settings;
+using Quartz;
 using Scalar.AspNetCore;
+using Serilog;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +35,23 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("localDb");
     options.UseNpgsql(connectionString);
 });
+
+// Serilog
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Minute)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+// Quartz
+builder.Services.AddJobs(
+    (typeof(ConsoleJob), "0 * * ? * *"),
+    (typeof(LogsCleanerJob), "0 * * ? * *")
+    );
+
+builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
 // Add automapper
 builder.Services.AddAutoMapper(cfg =>
@@ -73,11 +93,11 @@ builder.Services.AddCors(opt =>
 });
 
 // Bot
-string botToken = builder.Configuration["BotSettings:Token"] ?? string.Empty;
-builder.Services.AddHttpClient("tgClient")
-    .AddTypedClient<ITelegramBotClient>(httpClient => new TelegramBotClient(botToken, httpClient));
+//string botToken = builder.Configuration["BotSettings:Token"] ?? string.Empty;
+//builder.Services.AddHttpClient("tgClient")
+//    .AddTypedClient<ITelegramBotClient>(httpClient => new TelegramBotClient(botToken, httpClient));
 
-builder.Services.AddHostedService<ConfigureWebhook>();
+//builder.Services.AddHostedService<ConfigureWebhook>();
 
 var app = builder.Build();
 
@@ -101,7 +121,7 @@ app.UseAuthorization();
 app.AddStaticFiles(app.Environment);
 
 // Custom middlewares
-app.UseMiddleware<LoggingMiddleware>();
+//app.UseMiddleware<LoggingMiddleware>();
 
 app.MapControllers();
 

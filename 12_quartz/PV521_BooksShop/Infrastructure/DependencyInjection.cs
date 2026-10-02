@@ -5,6 +5,7 @@ using PV521_BooksShop.BLL.Services;
 using PV521_BooksShop.DAL.Abstraction;
 using PV521_BooksShop.DAL.Entities;
 using PV521_BooksShop.DAL.Repositories;
+using Quartz;
 using System.Text;
 
 namespace PV521_BooksShop.Infrastructure
@@ -33,6 +34,25 @@ namespace PV521_BooksShop.Infrastructure
             services.AddScoped<UserRepository>();
             services.AddScoped<UserTokenRepository>();
             services.AddScoped<RoleRepository>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddJobs(this IServiceCollection services, params (Type type, string cronExpression)[] jobs)
+        {
+            services.AddQuartz(q =>
+            {
+                foreach (var job in jobs)
+                {
+                    var jobKey = new JobKey(job.type.Name);
+                    q.AddJob(job.type, configure: cfg => cfg.WithIdentity(jobKey));
+
+                    q.AddTrigger(opt => opt
+                        .ForJob(jobKey)
+                        .WithIdentity($"{job.type.Name}-trigger")
+                        .WithCronSchedule(job.cronExpression));
+                }
+            });
 
             return services;
         }
