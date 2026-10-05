@@ -32,7 +32,7 @@ builder.Services.AddSwaggerGen();
 // Add dbcontext
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("localDb");
+    var connectionString = builder.Configuration.GetConnectionString("aivenDb");
     options.UseNpgsql(connectionString);
 });
 
@@ -48,7 +48,8 @@ builder.Host.UseSerilog();
 // Quartz
 builder.Services.AddJobs(
     (typeof(ConsoleJob), "0 * * ? * *"),
-    (typeof(LogsCleanerJob), "0 * * ? * *")
+    (typeof(LogsCleanerJob), "0 * * ? * *"),
+    (typeof(TelegramSubscribeJob), "0 0 9 * * ?")
     );
 
 builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
@@ -93,11 +94,11 @@ builder.Services.AddCors(opt =>
 });
 
 // Bot
-//string botToken = builder.Configuration["BotSettings:Token"] ?? string.Empty;
-//builder.Services.AddHttpClient("tgClient")
-//    .AddTypedClient<ITelegramBotClient>(httpClient => new TelegramBotClient(botToken, httpClient));
+string botToken = builder.Configuration["BotSettings:Token"] ?? string.Empty;
+builder.Services.AddHttpClient("tgClient")
+    .AddTypedClient<ITelegramBotClient>(httpClient => new TelegramBotClient(botToken, httpClient));
 
-//builder.Services.AddHostedService<ConfigureWebhook>();
+builder.Services.AddHostedService<ConfigureWebhook>();
 
 var app = builder.Build();
 

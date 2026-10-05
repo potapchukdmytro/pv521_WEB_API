@@ -16,6 +16,7 @@ namespace PV521_BooksShop.DAL
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserToken> UserTokens { get; set; }
+        public DbSet<TelegramChat> TelegramChats { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -105,6 +106,24 @@ namespace PV521_BooksShop.DAL
 
                 e.Property(u => u.PhoneNumber)
                .HasMaxLength(15);
+            });
+
+            // TelegramChat
+            builder.Entity<TelegramChat>(e =>
+            {
+                e.HasKey(tc => tc.Id);
+
+                e.Property(tc => tc.UserName)
+                .HasMaxLength(255);
+
+                e.Property(tc => tc.Title)
+                .HasMaxLength(255);
+
+                e.Property(tc => tc.FirstName)
+                .HasMaxLength(255);
+
+                e.Property(tc => tc.LastName)
+                .HasMaxLength(255);
             });
 
             // Relationships
