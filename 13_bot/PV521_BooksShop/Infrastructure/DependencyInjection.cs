@@ -23,6 +23,7 @@ namespace PV521_BooksShop.Infrastructure
             services.AddScoped<JwtService>();
             services.AddScoped<EmailService>();
             services.AddScoped<RoleService>();
+            services.AddScoped<BotService>();
 
             return services;
         }
