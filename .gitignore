@@ -15,7 +15,6 @@
 *.userprefs
 
 # Appsettings
-13_bot/PV521_BooksShop/appsettings.json
 appsettings.Development.json
 
 # Build results
