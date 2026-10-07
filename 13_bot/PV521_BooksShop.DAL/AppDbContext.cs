@@ -124,6 +124,9 @@ namespace PV521_BooksShop.DAL
 
                 e.Property(tc => tc.LastName)
                 .HasMaxLength(255);
+
+                e.Property(tc => tc.LastCommand)
+                .HasMaxLength(50);
             });
 
             // Relationships

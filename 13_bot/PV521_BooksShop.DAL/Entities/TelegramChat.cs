@@ -8,5 +8,6 @@
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public bool IsSubscribe { get; set; } = false;
+        public string LastCommand { get; set; } = "None";
     }
 }

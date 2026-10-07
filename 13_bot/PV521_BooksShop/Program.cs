@@ -49,7 +49,7 @@ builder.Host.UseSerilog();
 builder.Services.AddJobs(
     (typeof(ConsoleJob), "0 * * ? * *"),
     (typeof(LogsCleanerJob), "0 * * ? * *"),
-    (typeof(TelegramSubscribeJob), "0 0 9 * * ?")
+    (typeof(TelegramSubscribeJob), "0 0 19 * * ?")
     );
 
 builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
