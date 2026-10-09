@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PV521_BooksShop.BLL.Services;
 using PV521_BooksShop.BLL.Settings;
 using PV521_BooksShop.BLL.Validators.Book;
 using PV521_BooksShop.Configure;
@@ -49,7 +50,7 @@ builder.Host.UseSerilog();
 builder.Services.AddJobs(
     (typeof(ConsoleJob), "0 * * ? * *"),
     (typeof(LogsCleanerJob), "0 * * ? * *"),
-    (typeof(TelegramSubscribeJob), "0 0 19 * * ?")
+    (typeof(TelegramSubscribeJob), "0 0 9 * * ?")
     );
 
 builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
@@ -69,6 +70,7 @@ builder.Services
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.Configure<BotSettings>(builder.Configuration.GetSection("BotSettings"));
+builder.Services.Configure<WeatherApiSettings>(builder.Configuration.GetSection("WeatherApi"));
 
 // Disable default validation
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -91,6 +93,12 @@ builder.Services.AddCors(opt =>
         .AllowAnyMethod()
         .AllowCredentials();
     });
+});
+
+// HttpClients
+builder.Services.AddHttpClient<WeatherApiService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
 });
 
 // Bot

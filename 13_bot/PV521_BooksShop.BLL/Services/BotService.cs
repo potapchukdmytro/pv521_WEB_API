@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
+using PV521_BooksShop.BLL.Dtos.Api;
 using PV521_BooksShop.BLL.Dtos.Parser;
 using PV521_BooksShop.DAL;
 using PV521_BooksShop.DAL.Entities;
@@ -14,16 +15,18 @@ namespace PV521_BooksShop.BLL.Services
     public enum Command
     {
         None,
-        YoutubeAudio
+        YoutubeAudio,
+        Weather
     }
 
     public class BotService
     {
         private readonly ITelegramBotClient _botClient;
         private readonly AppDbContext _context;
+        private readonly WeatherApiService _weatherApi;
         private readonly Dictionary<List<string>, Func<Message, TelegramChat, CancellationToken, Task>> _commands;
 
-        public BotService(ITelegramBotClient botClient, AppDbContext context)
+        public BotService(ITelegramBotClient botClient, AppDbContext context, WeatherApiService weatherApi)
         {
             _botClient = botClient;
             _context = context;
@@ -35,6 +38,7 @@ namespace PV521_BooksShop.BLL.Services
                     {["графіки відключень"], DisconnectionsCommand },
                     {["youtube аудіо"], YoutubeAudioCommand }
             };
+            _weatherApi = weatherApi;
         }
 
         public async Task UpdateHandlerAsync(Update update, CancellationToken ct = default)
@@ -50,6 +54,12 @@ namespace PV521_BooksShop.BLL.Services
                 if(lastCommand == Command.YoutubeAudio)
                 {
                     await SendYoutubeAudioAsync(message, telegramChat, ct);
+                    return;
+                }
+
+                if (lastCommand == Command.Weather)
+                {
+                    await SendWeatherMessage(message, telegramChat, ct);
                     return;
                 }
 
@@ -110,7 +120,48 @@ namespace PV521_BooksShop.BLL.Services
 
         public async Task WeatherCommand(Message message, TelegramChat telegramChat, CancellationToken ct = default)
         {
-            await _botClient.SendMessage(message.Chat.Id, "Тут буде погода", cancellationToken: ct);
+            telegramChat.LastCommand = Enum.GetName(Command.Weather) ?? "Weather";
+            await _context.SaveChangesAsync(ct);
+
+            await _botClient.SendMessage(message.Chat.Id, "Напиши місто для якого хочеш отримати прогноз погоди", cancellationToken: ct);
+        }
+
+        public async Task SendWeatherMessage(Message message, TelegramChat telegramChat, CancellationToken ct = default)
+        {
+            string city = message.Text?.Trim() ?? string.Empty;
+
+            var weatherResponse = await _weatherApi.GetWeatherAsync(city, ct);
+
+            if(!weatherResponse.IsSuccess)
+            {
+                await _botClient.SendMessage(message.Chat.Id, weatherResponse.Message, cancellationToken: ct);
+            }
+
+            var weather = weatherResponse.Payload as WeatherDto;
+
+            if(weather == null)
+            {
+                telegramChat.LastCommand = Enum.GetName(Command.None) ?? "None";
+                await _context.SaveChangesAsync(ct);
+                await _botClient.SendMessage(message.Chat.Id, "Не вдалося отримати дані про погоду", cancellationToken: ct);
+                return;
+            }
+
+            var sunrise = new DateTime(1970, 1, 1).AddHours(3).AddSeconds(weather.sys.sunrise);
+            var sunset = new DateTime(1970, 1, 1).AddHours(3).AddSeconds(weather.sys.sunset);
+
+            string responseMessage = $"Погода у місті {city}\n" +
+                $"Температура: {weather.main.temp}°C\n" +
+                $"Вологість: {weather.main.humidity}%\n" +
+                $"Тиск: {weather.main.pressure * 0.75} мм\n" +
+                $"Швидкість вітру: {weather.wind.speed} м/c\n" +
+                $"Напрям вітру: {WeatherApiService.WindDirection(weather.wind.deg)}\n" +
+                $"Схід сонця: {sunrise.Hour}:{sunrise.Minute}\n" +
+                $"Захід сонця: {sunset.Hour}:{sunset.Minute}";
+
+            telegramChat.LastCommand = Enum.GetName(Command.None) ?? "None";
+            await _context.SaveChangesAsync(ct);
+            await _botClient.SendMessage(message.Chat.Id, responseMessage, cancellationToken: ct);
         }
 
         public async Task SubscribeCommand(Message message, TelegramChat telegramChat, CancellationToken ct = default)
