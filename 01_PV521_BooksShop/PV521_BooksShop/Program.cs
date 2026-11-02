@@ -22,6 +22,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Repositories
 builder.Services.AddScoped<BookRepostiory>();
 
+using PV521_BooksShop.Services;
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
