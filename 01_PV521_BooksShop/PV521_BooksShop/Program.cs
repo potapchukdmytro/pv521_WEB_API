@@ -3,6 +3,9 @@ using PV521_BooksShop.DAL;
 using PV521_BooksShop.DAL.Initializer;
 using PV521_BooksShop.DAL.Repositories;
 using Scalar.AspNetCore;
+using FluentValidation;
+using PV521_BooksShop.Controllers;
+using PV521_BooksShop.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +25,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Repositories
 builder.Services.AddScoped<BookRepostiory>();
 
+builder.Services.AddScoped<
+    IValidator<AuthorUploadDto>,
+    AuthorUploadValidator>();
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
