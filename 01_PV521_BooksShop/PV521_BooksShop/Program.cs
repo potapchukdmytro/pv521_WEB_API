@@ -3,6 +3,7 @@ using PV521_BooksShop.DAL;
 using PV521_BooksShop.DAL.Initializer;
 using PV521_BooksShop.DAL.Repositories;
 using Scalar.AspNetCore;
+using PV521_BooksShop.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Repositories
 builder.Services.AddScoped<BookRepostiory>();
 
+builder.Services.AddScoped<AuthorRepository>();
+builder.Services.AddScoped<AuthorService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
