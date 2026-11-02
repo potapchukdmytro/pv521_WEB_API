@@ -14,6 +14,7 @@ builder.Services.AddOpenApi();
 
 // Add dbcontext
 builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddScoped<AuthorRepository>();
 {
     var connectionString = builder.Configuration.GetConnectionString("localDb");
     options.UseNpgsql(connectionString);
