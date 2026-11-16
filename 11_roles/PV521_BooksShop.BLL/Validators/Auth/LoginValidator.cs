@@ -1,21 +1,24 @@
-﻿using FluentValidation;
+using FluentValidation;
 using PV521_BooksShop.BLL.Dtos.Auth;
-using System.Text.RegularExpressions;
 
 namespace PV521_BooksShop.BLL.Validators.Auth
 {
-    public class LoginValidator : AbstractValidator<LoginDto>
+    public class ChangePasswordValidator : AbstractValidator<ChangePasswordDto>
     {
-        public LoginValidator()
+        public ChangePasswordValidator()
         {
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Пошта є обов'язковою")
-                .Matches(@"^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$", RegexOptions.IgnoreCase)
-                .WithMessage("Невірний формат пошти");
+            RuleFor(dto => dto.CurrentPassword)
+                .NotEmpty()
+                .WithMessage("Вкажіть поточний пароль");
 
-            RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Пароль є обов'язковим")
-                .MinimumLength(6).WithMessage("Мінімальна довжина 6 символів");
+            RuleFor(dto => dto.NewPassword)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .WithMessage("Вкажіть новий пароль")
+                .MinimumLength(6)
+                .WithMessage("Мінімальна довжина пароля — 6 символів")
+                .NotEqual(dto => dto.CurrentPassword)
+                .WithMessage("Новий пароль має відрізнятися від поточного");
         }
     }
 }
