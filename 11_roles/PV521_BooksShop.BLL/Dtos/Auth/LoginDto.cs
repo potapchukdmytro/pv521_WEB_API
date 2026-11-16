@@ -1,8 +1,8 @@
-﻿namespace PV521_BooksShop.BLL.Dtos.Auth
+namespace PV521_BooksShop.BLL.Dtos.Auth
 {
-    public class LoginDto
+    public class ChangePasswordDto
     {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public string CurrentPassword { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
     }
 }
