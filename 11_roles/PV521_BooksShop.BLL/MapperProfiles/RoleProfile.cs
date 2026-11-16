@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using PV521_BooksShop.BLL.Dtos.Role;
 using PV521_BooksShop.DAL.Entities;
 
@@ -8,14 +8,16 @@ namespace PV521_BooksShop.BLL.MapperProfiles
     {
         public RoleProfile()
         {
-            // Role -> RoleDto
             CreateMap<Role, RoleDto>();
 
-            // CreateRoleDto -> Role
-            CreateMap<CreateRoleDto, Role>();
+            CreateMap<CreateRoleDto, Role>()
+                .ForMember(role => role.Name,
+                    options => options.MapFrom(dto => dto.Name.Trim()));
 
-            // UpdateRoleDto -> Role
-            CreateMap<UpdateRoleDto, Role>();
+            CreateMap<UpdateRoleDto, Role>()
+                .ForMember(role => role.Id, options => options.Ignore())
+                .ForMember(role => role.Name,
+                    options => options.MapFrom(dto => dto.Name.Trim()));
         }
     }
 }
