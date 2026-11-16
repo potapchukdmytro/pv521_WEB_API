@@ -7,6 +7,7 @@ using PV521_BooksShop.BLL.Dtos.Auth;
 using PV521_BooksShop.BLL.Services;
 using PV521_BooksShop.BLL.Settings;
 using PV521_BooksShop.Extensions;
+using System.Net.Http.Headers;
 
 namespace PV521_BooksShop.Controllers
 {
@@ -65,6 +66,39 @@ namespace PV521_BooksShop.Controllers
 
             return BadRequest(response);
         }
+
+    [Authorize]
+    [HttpPut("change-password")]
+    public async Task<IActionResult> ChangePasswordAsync(
+    [FromBody] ChangePasswordDto dto,
+        [FromServices] UserService userService,
+        [FromServices] IValidator<ChangePasswordDto> validator,
+        CancellationToken ct = default)
+    {
+    var authorization = Request.Headers["Authorization"].ToString();
+
+        if (!AuthenticationHeaderValue.TryParse(authorization, out var header) ||
+                !string.Equals(header.Scheme, "Bearer", StringComparison.OrdinalIgnoreCase) ||
+                string.IsNullOrWhiteSpace(header.Parameter))
+    {
+        return Unauthorized(ServiceResponseDto.Error("Потрібен Bearer-токен"));
+    }
+
+    if (!int.TryParse(User.FindFirst("id")?.Value, out int userId) || userId <= 0)
+    {
+        return Unauthorized(ServiceResponseDto.Error("Невалідний токен"));
+    }
+
+    var validation = await validator.ValidateAsync(dto, ct);
+
+    if (!validation.IsValid)
+    {
+        return this.GetValiationErrorResponse(validation);
+    }
+
+    var response = await userService.ChangePasswordAsync(userId, dto, ct);
+    return this.GetHttpResponse(response);
+}
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto, CancellationToken ct = default)
